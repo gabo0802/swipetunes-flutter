@@ -11,6 +11,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  http: ^0.13.3
+  spotify: ^0.11.0
+  uni_links_desktop: ^0.1.6
+  desktop_window: ^0.4.0
+  provider: ^5.0.0
+
 
 
   # The following adds the Cupertino Icons font to your application.
