@@ -11,31 +11,42 @@ class DiscoverPage extends StatelessWidget {
     final controller = context.watch<SwipeTunesController>();
     final track = controller.currentTrack;
     final hasPreview = (track?.previewUrl?.isNotEmpty ?? false);
+    final selectedSeedLabel = controller.selectedYouTubePlaylistTitle;
 
     if (track == null) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'You reached the end of this stack.',
-                style: Theme.of(context).textTheme.headlineSmall,
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.queue_music_rounded,
+                      size: 48, color: Color(0xFF97B0FF)),
+                  const SizedBox(height: 10),
+                  Text(
+                    'You reached the end of this stack',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Liked songs: ${controller.likedSongs.length}',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: controller.signInWithYouTubeMusic,
+                    child: const Text('Load New Recommendations'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Liked songs: ${controller.likedSongs.length}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: controller.activeSource == MusicSource.spotify
-                    ? controller.signInWithSpotify
-                    : controller.signInWithYouTubeMusic,
-                child: const Text('Load New Recommendations'),
-              ),
-            ],
+            ),
           ),
         ),
       );
@@ -67,14 +78,15 @@ class DiscoverPage extends StatelessWidget {
                           aspectRatio: 1,
                           child: ClipRRect(
                             borderRadius: const BorderRadius.all(
-                              Radius.circular(18),
+                              Radius.circular(16),
                             ),
                             child: track.albumArtUrl.isEmpty
                                 ? const ColoredBox(
-                                    color: Color(0xFF232A34),
+                                    color: Color(0xFFDCEFD7),
                                     child: Icon(
                                       Icons.music_note_rounded,
                                       size: 88,
+                                      color: Colors.black45,
                                     ),
                                   )
                                 : Image.network(
@@ -83,46 +95,57 @@ class DiscoverPage extends StatelessWidget {
                                     errorBuilder:
                                         (context, error, stackTrace) =>
                                             const ColoredBox(
-                                      color: Color(0xFF232A34),
+                                      color: Color(0xFFDCEFD7),
                                       child: Icon(
                                         Icons.broken_image_outlined,
                                         size: 72,
+                                        color: Colors.black45,
                                       ),
                                     ),
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 18),
                         Text(
                           track.name,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineSmall,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         Text(
                           track.artist,
                           textAlign: TextAlign.center,
                           style:
                               Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Colors.white70,
+                                    color: Colors.black54,
                                   ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            IconButton.filledTonal(
+                            _ActionChipButton(
                               tooltip: 'Dismiss (Swipe Left)',
-                              onPressed: () => controller
+                              background: const Color(0xFFF3A4B0),
+                              icon: Icons.stop_rounded,
+                              onTap: () => controller
                                   .swipeCurrent(SwipeAction.dismissed),
-                              icon: const Icon(Icons.close_rounded),
                             ),
-                            const SizedBox(width: 16),
-                            IconButton.filled(
+                            const SizedBox(width: 14),
+                            _ActionChipButton(
                               tooltip: hasPreview
                                   ? 'Play / Pause Preview'
                                   : 'Play full song externally',
-                              onPressed: hasPreview
+                              background: const Color(0xFF8EDFC6),
+                              icon: controller.isPlayingPreview
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded,
+                              onTap: hasPreview
                                   ? controller.togglePreview
                                   : () async {
                                       final messenger =
@@ -139,31 +162,25 @@ class DiscoverPage extends StatelessWidget {
                                           );
                                       }
                                     },
-                              icon: Icon(
-                                controller.isPlayingPreview
-                                    ? Icons.pause_rounded
-                                    : Icons.play_arrow_rounded,
-                              ),
                             ),
-                            const SizedBox(width: 16),
-                            IconButton.filledTonal(
+                            const SizedBox(width: 14),
+                            _ActionChipButton(
                               tooltip: 'Like (Swipe Right)',
-                              onPressed: () =>
+                              background: const Color(0xFF8EDFC6),
+                              icon: Icons.favorite_rounded,
+                              onTap: () =>
                                   controller.swipeCurrent(SwipeAction.liked),
-                              icon: const Icon(Icons.favorite_rounded),
                             ),
                           ],
                         ),
                         if (!hasPreview) ...[
                           const SizedBox(height: 10),
                           Text(
-                            controller.activeSource == MusicSource.youtubeMusic
-                                ? 'Preview unavailable on this YT Music track yet. Play opens the full song externally.'
-                                : 'Preview unavailable for this track. Play opens it externally.',
+                            'Preview unavailable on this YT Music track yet. Play opens the full song externally.',
                             textAlign: TextAlign.center,
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Colors.white60,
+                                      color: Colors.black54,
                                     ),
                           ),
                         ],
@@ -175,9 +192,34 @@ class DiscoverPage extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 'Swipe right to like • Swipe left to dismiss',
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: Colors.black54),
               ),
               const SizedBox(height: 12),
+              if (controller.activeSource == MusicSource.youtubeMusic)
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEAF6EF),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    selectedSeedLabel == null
+                        ? 'Seed playlist: Not selected yet'
+                        : 'Seed playlist: $selectedSeedLabel',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Colors.black54),
+                  ),
+                ),
+              if (controller.activeSource == MusicSource.youtubeMusic)
+                const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
@@ -192,14 +234,44 @@ class DiscoverPage extends StatelessWidget {
                             ..showSnackBar(SnackBar(content: Text(message)));
                         },
                   icon: const Icon(Icons.playlist_add_check_rounded),
-                  label: Text(
-                    controller.canSyncPlaylist
-                        ? 'Save Liked Songs to Spotify'
-                        : 'Save Playlist (Source Limited)',
-                  ),
+                  label: const Text('Export Liked Songs (Coming Soon)'),
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionChipButton extends StatelessWidget {
+  const _ActionChipButton({
+    required this.tooltip,
+    required this.background,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String tooltip;
+  final Color background;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: background,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: SizedBox(
+            width: 72,
+            height: 72,
+            child: Icon(icon, size: 38, color: Colors.black87),
           ),
         ),
       ),

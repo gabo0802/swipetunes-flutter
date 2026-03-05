@@ -4,14 +4,14 @@ Flutter port of the original SwipeTunes project from `gabo0802/swipetunes-person
 
 ## Current Features
 
-- Spotify-inspired login screen
+- YT Music-first login flow
 - Discover tab with swipe-style interactions:
 	- swipe right to like a song
 	- swipe left to dismiss a song
 	- play/pause preview when available
 - Log tab with recently swiped songs and timestamps
-- Export liked songs to a Spotify playlist (when token is configured)
-- Demo mode fallback when no Spotify token is provided
+- Playlist-seeded recommendation flow for YT Music
+- Provider architecture kept extensible for future streaming integrations
 
 ## Run
 
@@ -20,17 +20,11 @@ flutter pub get
 flutter run
 ```
 
-## Spotify Setup (Optional)
+## Spotify Status
 
-The app supports direct Spotify API calls using a pre-generated OAuth access token.
+Spotify support is temporarily deprecated in the current UX.
 
-Run with:
-
-```bash
-flutter run --dart-define=SPOTIFY_ACCESS_TOKEN=your_access_token_here
-```
-
-If no token is provided, SwipeTunes runs in demo mode using local sample tracks.
+The codebase still keeps provider abstractions so Spotify (or other providers) can be re-enabled later without a full architecture rewrite.
 
 ## Google OAuth Setup (Desktop)
 
@@ -44,8 +38,6 @@ The YT Music button now triggers real Google OAuth on desktop using a loopback c
 flutter run -d windows --dart-define-from-file=secrets/oauth.env.json
 ```
 
-You can combine both configs in the same file by adding `SPOTIFY_ACCESS_TOKEN` too.
-
 If you see `invalid_client: Unauthorized`:
 
 - Confirm you created a Google OAuth **Desktop app** client (not Android/iOS/Web)
@@ -56,5 +48,5 @@ If you see `invalid_client: Unauthorized`:
 ## Notes
 
 - This port keeps the original product flow: `Login -> Discover -> Log`.
-- Spotify playlist creation still requires a valid Spotify access token.
-- YT Music recommendations and export are currently scaffolded and still use demo recommendation data after Google sign-in.
+- YT Music is the active provider path right now.
+- Playlist export is intentionally disabled while provider integrations are being refreshed.

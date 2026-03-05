@@ -5,8 +5,9 @@ void main() {
   testWidgets('SwipeTunes login screen renders', (WidgetTester tester) async {
     await tester.pumpWidget(const SwipeTunesRoot());
 
-    expect(find.text('SwipeTunes'), findsWidgets);
-    expect(find.text('Continue with Spotify'), findsOneWidget);
+    expect(find.text('swipetunes'), findsWidgets);
     expect(find.text('Continue with YT Music'), findsOneWidget);
+    expect(find.textContaining('Spotify is temporarily deprecated'),
+        findsOneWidget);
   });
 }

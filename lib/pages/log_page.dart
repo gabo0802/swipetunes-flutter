@@ -15,9 +15,15 @@ class LogPage extends StatelessWidget {
 
     if (log.isEmpty) {
       return Center(
-        child: Text(
-          'No swipes yet. Start discovering songs.',
-          style: Theme.of(context).textTheme.titleMedium,
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'No swipes yet. Start discovering songs.',
+              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
       );
     }
@@ -46,18 +52,33 @@ class LogPage extends StatelessWidget {
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: isLiked
-                        ? const Color(0xFF65DFA3)
-                        : const Color(0xFFEE8F8F),
+                        ? const Color(0xFF8EDFC6)
+                        : const Color(0xFFF3A4B0),
                     child: Icon(
                       isLiked ? Icons.favorite_rounded : Icons.close_rounded,
-                      color: Colors.black,
+                      color: Colors.black87,
                     ),
                   ),
                   title: Text(entry.track.name),
                   subtitle: Text(
                     '${entry.track.artist} • ${formatter.format(entry.timestamp)}',
                   ),
-                  trailing: Text(isLiked ? 'Liked' : 'Skipped'),
+                  trailing: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isLiked
+                          ? const Color(0xFFEAF6EF)
+                          : const Color(0xFFFBE7EA),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      isLiked ? 'Liked' : 'Skipped',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ),
                 ),
               );
             },
